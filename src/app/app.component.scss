@@ -47,6 +47,25 @@ $nav: 60px;
                 
                 mat-card {
                     margin-bottom: 24px;
+                    .footer {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        button,
+                        a {
+                            &.mat-button,
+                            &.mat-raised-button,
+                            &.mat-flat-button,
+                            &.mat-stroked-button {
+                                .mat-icon {
+                                    vertical-align: top;
+                                    font-size: 1.25em;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 .input-list {
@@ -88,34 +107,23 @@ $nav: 60px;
                     ::ng-deep .mat-form-field.mat-form-field-invalid .mat-form-field-label {
                         color: red!important;
                     }
-
-                    
-
                 }
 
                 .experiment {
-                    .header {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: space-between;
-                        align-items: center;
+                    
 
-                        button,
-                        a {
-                            &.mat-button,
-                            &.mat-raised-button,
-                            &.mat-flat-button,
-                            &.mat-stroked-button {
-                                .mat-icon {
-                                    vertical-align: top;
-                                    font-size: 1.25em;
+                    .experiment-content {
+                        .experiment-result {
+                            .result {
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                .result-form {
+                                    width: 65%;
                                 }
                             }
                         }
-                    }
-
-                    .experiment-content {
-                        //padding: 12px;
                     }
                 }
             }

@@ -13,54 +13,6 @@
     </div>
 
     <mat-drawer-container class="app">
-      <!-- <mat-drawer #drawer mode="side" opened>
-        <div class="drawer-content">
-          <div class="drawer-title">
-            <h2 style="margin: 8px 0 8px 0;">Configuration</h2>
-          </div>
-          <mat-divider></mat-divider>
-          <div class="drawer-config">
-            <h3>Number to find:</h3>
-            <mat-form-field appearance="outline" style="width: 100%;">
-              <input matInput [formControl]="number">
-              <mat-icon matSuffix>track_changes</mat-icon>
-            </mat-form-field>
-
-            <h3>Number Of Cards: {{ n }} </h3>
-            <mat-slider style="width: 100%;" [thumbLabel]="true" [min]="2" [max]="8" [(ngModel)]="n"></mat-slider>
-
-            <h3>Run with:</h3>
-            <div class="backend">
-              <mat-radio-group class="radio-group" [(ngModel)]="backend">
-                <mat-radio-button class="radio-button" value="player">
-                  Player
-                </mat-radio-button>
-                <mat-radio-button class="radio-button" value="classical">
-                  Classical (Loop)
-                </mat-radio-button>
-                <mat-radio-button class="radio-button" value="simulator">
-                  Quantum (Simulator)
-                </mat-radio-button>
-                <mat-radio-button class="radio-button" value="ibm">
-                  Quantum (IBM)
-                </mat-radio-button>
-              </mat-radio-group>
-            </div>
-
-            <h3>Actions:</h3>
-            <div class="actions">
-              <button mat-stroked-button color="accent" style="margin-bottom: 6px;" (click)="generate()">
-                <mat-icon inline=true>library_add</mat-icon>
-                Generate
-              </button>
-              <button mat-stroked-button color="accent" (click)="shuffle()" [disabled]="cards?.length == 0 || game">
-                <mat-icon inline=true>shuffle</mat-icon>
-                Shuffle
-              </button>
-            </div>
-          </div>
-        </div>
-      </mat-drawer> -->
       <mat-drawer-content class="app-content">
         <section>
           <mat-card>
@@ -86,20 +38,19 @@
                   <input matInput [formControl]="hash">
                 </mat-form-field>
               </div>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="experiment">
-            <mat-card-content>
-              <div class="header">
+              <div class="footer">
                 <h2 class="example-h2">Experiment</h2>
                 <button mat-raised-button color="accent" (click)="run()" [disabled]="n.invalid || target.invalid">
                   <mat-icon inline=true>play_arrow</mat-icon>
                   Run
                 </button>
               </div>
-              <div class="experiment-content">
-                <mat-list>
+            </mat-card-content>
+          </mat-card>
+
+          <div class="experiment">
+            <div class="experiment-content">
+              <!-- <mat-list>
 
                   <mat-list-item>
                     <mat-icon mat-list-icon>developer_board</mat-icon>
@@ -139,10 +90,98 @@
                     </div>
                   </mat-list-item>
 
-                </mat-list>
-              </div>
-            </mat-card-content>
-          </mat-card>
+                </mat-list> -->
+              <mat-accordion class="experiment-result">
+
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <mat-spinner *ngIf="isClassicalRun" style="margin-right: 6px;" color="accent" mode="indeterminate"
+                        diameter="16"></mat-spinner>
+                      Classical
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <div class="result">
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Solve Time</mat-label>
+                      <input matInput [formControl]="classicalTime">
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Result</mat-label>
+                      <input matInput [formControl]="classicalResult">
+                    </mat-form-field>
+                  </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <mat-spinner *ngIf="isQuantumLocalRun" style="margin-right: 6px;" color="accent" mode="indeterminate"
+                        diameter="16"></mat-spinner>
+                        Quantum Simulator Local
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <div class="result">
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Solve Time</mat-label>
+                      <input matInput [formControl]="localTime">
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Best Result</mat-label>
+                      <input matInput [formControl]="localResult">
+                    </mat-form-field>
+                  </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <mat-spinner *ngIf="isQuantumSimulatorRun" style="margin-right: 6px;" color="accent" mode="indeterminate"
+                        diameter="16"></mat-spinner>
+                        Quantum Simulator Remote
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <div class="result">
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Solve Time</mat-label>
+                      <input matInput [formControl]="simulatorTime">
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Best Result</mat-label>
+                      <input matInput [formControl]="simulatorTime">
+                    </mat-form-field>
+                  </div>
+
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <mat-spinner *ngIf="isQuantumRealRun" style="margin-right: 6px;" color="accent" mode="indeterminate"
+                        diameter="16"></mat-spinner>
+                        Quantum Real
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <div class="result">
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Solve Time</mat-label>
+                      <input matInput [formControl]="realTime">
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="result-form">
+                      <mat-label>Best Result</mat-label>
+                      <input matInput [formControl]="realResult">
+                    </mat-form-field>
+                  </div>
+
+                </mat-expansion-panel>
+
+              </mat-accordion>
+            </div>
+          </div>
         </section>
       </mat-drawer-content>
     </mat-drawer-container>
