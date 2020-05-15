@@ -13,8 +13,8 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
 
-  n: FormControl = new FormControl('', [Validators.required, Validators.min(2), Validators.max(4096)]);
-  target: FormControl = new FormControl('', [Validators.required, this.isPowOfTwo]);
+  n: FormControl = new FormControl('', [Validators.required, Validators.min(2), Validators.max(4096), this.isPowOfTwo]);
+  target: FormControl = new FormControl('', [Validators.required, Validators.min(0)]);
   hash: FormControl = new FormControl('', []);
   isRun: boolean = false;
 
@@ -28,15 +28,23 @@ export class AppComponent implements OnInit {
 
   localTime: FormControl = new FormControl('', []);
   localResult: FormControl = new FormControl('', []);
-  localMeasurements: FormControl = new FormControl('', []);
+  localMeasurements = [];
 
   simulatorTime: FormControl = new FormControl('', []);
   simulatorResult: FormControl = new FormControl('', []);
-  simulatorMeasurements: FormControl = new FormControl('', []);
+  simulatorMeasurements = [];
 
   realTime: FormControl = new FormControl('', []);
   realResult: FormControl = new FormControl('', []);
-  realMeasurements: FormControl = new FormControl('', []);
+  realMeasurements = [];
+
+
+  type = 'BarChart';
+  options = {   
+    legend:'none',
+  };
+  width = 550;
+  height = 400;
 
   constructor(private http: HttpClient) { }
 
@@ -47,13 +55,10 @@ export class AppComponent implements OnInit {
     this.classicalResult.disable()
     this.localTime.disable()
     this.localResult.disable();
-    this.localMeasurements.disable();
     this.simulatorTime.disable()
     this.simulatorResult.disable();
-    this.simulatorMeasurements.disable();
     this.realTime.disable()
     this.realResult.disable();
-    this.realMeasurements.disable();
 
     this.target
       .valueChanges
@@ -72,13 +77,54 @@ export class AppComponent implements OnInit {
     return isPow ? null : { 'not_pow_of_two': true };
   }
 
-  run() {
-    console.log('Start experiment!');
-    this.isRun = true;
-    this.isClassicalRun = true;
-    this.isQuantumLocalRun = true;
+  runQuantumSimulator() {
     this.isQuantumSimulatorRun = true;
+
+    this.http.get<any>(`/api/solve?backend=quantum_simulator&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
+      (data) => {
+        this.isQuantumSimulatorRun = false;
+        this.simulatorTime.setValue(data.seconds);
+        this.simulatorResult.setValue(data.value.best_value);
+        for (const [key, value] of Object.entries(data.value.measurements)) {
+          this.simulatorMeasurements.push([key, value])
+        }
+      }
+    );
+  }
+  
+  runQuantumReal() {
     this.isQuantumRealRun = true;
+
+    this.http.get<any>(`/api/solve?backend=quantum_real&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
+      (data) => {
+        this.isQuantumRealRun = false;
+        this.realTime.setValue(data.seconds);
+        this.realResult.setValue(data.value.best_value);
+        for (const [key, value] of Object.entries(data.value.measurements)) {
+          this.realMeasurements.push([key, value])
+        }
+      }
+    );
+  }
+  
+  runQuantumLocal() {
+    this.isQuantumLocalRun = true;
+
+    this.http.get<any>(`/api/solve?backend=quantum_local&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
+      (data) => {
+        this.isQuantumLocalRun = false;
+        this.localTime.setValue(data.seconds);
+        this.localResult.setValue(data.value.best_value);
+        for (const [key, value] of Object.entries(data.value.measurements)) {
+          this.localMeasurements.push([key, value])
+        }
+        console.log(this.localMeasurements)
+      }
+    );
+  }
+
+  runClassical() {
+    this.isClassicalRun = true;
 
     this.http.get<any>(`/api/solve?backend=classical&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
       (data) => {
@@ -89,29 +135,14 @@ export class AppComponent implements OnInit {
         }
       }
     );
-    this.http.get<any>(`/api/solve?backend=quantum_local&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
-      (data) => {
-        this.isQuantumLocalRun = false;
-        this.localTime.setValue(data.seconds);
-        this.localResult.setValue(data.value.best_value);
-        this.localMeasurements.setValue(data.value.measurements);
-      }
-    );
-    this.http.get<any>(`/api/solve?backend=quantum_simulator&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
-      (data) => {
-        this.isQuantumSimulatorRun = false;
-        this.simulatorTime.setValue(data.seconds);
-        this.simulatorResult.setValue(data.value.best_value);
-        this.simulatorMeasurements.setValue(data.value.measurements);
-      }
-    );
-    this.http.get<any>(`/api/solve?backend=quantum_real&hash=${this.hash.value}&n=${this.n.value}`).subscribe(
-      (data) => {
-        this.isQuantumRealRun = false;
-        this.realTime.setValue(data.seconds);
-        this.realResult.setValue(data.value.best_value);
-        this.realMeasurements.setValue(data.value.measurements);
-      }
-    );
+  }
+
+  run() {
+    console.log('Start experiment!');
+    this.isRun = true;
+    this.runClassical()
+    this.runQuantumLocal()
+    this.runQuantumSimulator()
+    this.runQuantumReal()
   }
 }

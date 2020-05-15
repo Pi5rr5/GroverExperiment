@@ -23,14 +23,14 @@
                   <mat-label>N</mat-label>
                   <input matInput type="number" [formControl]="n">
                   <mat-icon matSuffix>straighten</mat-icon>
-                  <mat-error>N is required and must be between 2 and 4096</mat-error>
+                  <mat-error>N is required and must be between 2 and 4096 and must be a power of two like: 1, 2, 4, 8 ...</mat-error>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="input-form">
                   <mat-label>Target</mat-label>
                   <input matInput type="number" [formControl]="target">
                   <mat-icon matSuffix>track_changes</mat-icon>
-                  <mat-error>Target is required and must be a power of two like: 1, 2, 4, 8 ...</mat-error>
+                  <mat-error>Target is required</mat-error>
                 </mat-form-field>
 
                 <mat-form-field appearance="fill" class="input-form">
@@ -42,7 +42,7 @@
                 <h2 class="example-h2">Experiment</h2>
                 <button mat-raised-button color="accent" (click)="run()" [disabled]="n.invalid || target.invalid">
                   <mat-icon inline=true>play_arrow</mat-icon>
-                  Run
+                  Run all
                 </button>
               </div>
             </mat-card-content>
@@ -50,47 +50,6 @@
 
           <div class="experiment">
             <div class="experiment-content">
-              <!-- <mat-list>
-
-                  <mat-list-item>
-                    <mat-icon mat-list-icon>developer_board</mat-icon>
-                    <div mat-line>Classical</div>
-                    <div>
-                      <mat-spinner *ngIf="isClassicalRun" color="accent" mode="indeterminate" diameter="20" n></mat-spinner>
-                    </div>
-                  </mat-list-item>
-
-                  <mat-divider [inset]="true"></mat-divider>
-
-                  <mat-list-item>
-                    <mat-icon mat-list-icon>developer_board</mat-icon>
-                    <div mat-line>Quantum Simulator Local</div>
-                    <div>
-                      <mat-spinner *ngIf="isQuantumLocalRun" color="accent" mode="indeterminate" diameter="20"></mat-spinner>
-                    </div>
-                  </mat-list-item>
-
-                  <mat-divider [inset]="true"></mat-divider>
-
-                  <mat-list-item>
-                    <mat-icon mat-list-icon>developer_board</mat-icon>
-                    <div mat-line>Quantum Simulator Remote</div>
-                    <div>
-                      <mat-spinner *ngIf="isQuantumSimulatorRun" color="accent" mode="indeterminate" diameter="20"></mat-spinner>
-                    </div>
-                  </mat-list-item>
-
-                  <mat-divider [inset]="true"></mat-divider>
-
-                  <mat-list-item>
-                    <mat-icon mat-list-icon>developer_board</mat-icon>
-                    <div mat-line>Quantum Real</div>
-                    <div>
-                      <mat-spinner *ngIf="isQuantumRealRun" color="accent" mode="indeterminate" diameter="20"></mat-spinner>
-                    </div>
-                  </mat-list-item>
-
-                </mat-list> -->
               <mat-accordion class="experiment-result">
 
                 <mat-expansion-panel>
@@ -104,13 +63,16 @@
 
                   <div class="result">
                     <mat-form-field appearance="fill" class="result-form">
-                      <mat-label>Solve Time</mat-label>
+                      <mat-label>Solve Time (seconds)</mat-label>
                       <input matInput [formControl]="classicalTime">
                     </mat-form-field>
                     <mat-form-field appearance="fill" class="result-form">
                       <mat-label>Result</mat-label>
                       <input matInput [formControl]="classicalResult">
                     </mat-form-field>
+                    <button mat-raised-button color="accent" *ngIf="!isClassicalRun" (click)="runClassical()" [disabled]="n.invalid || target.invalid">
+                      <mat-icon inline=true>play_arrow</mat-icon>
+                    </button>
                   </div>
                 </mat-expansion-panel>
 
@@ -125,13 +87,23 @@
 
                   <div class="result">
                     <mat-form-field appearance="fill" class="result-form">
-                      <mat-label>Solve Time</mat-label>
+                      <mat-label>Solve Time (seconds)</mat-label>
                       <input matInput [formControl]="localTime">
                     </mat-form-field>
                     <mat-form-field appearance="fill" class="result-form">
                       <mat-label>Best Result</mat-label>
                       <input matInput [formControl]="localResult">
                     </mat-form-field>
+                    <google-chart #chart *ngIf="localMeasurements.length != 0"
+                      [type]="type"
+                      [data]="localMeasurements"
+                      [options]="options"
+                      [width]="width"
+                      [height]="height">
+                    </google-chart>
+                    <button mat-raised-button color="accent" *ngIf="!isQuantumLocalRun" (click)="runQuantumLocal()" [disabled]="n.invalid || target.invalid">
+                      <mat-icon inline=true>play_arrow</mat-icon>
+                    </button>
                   </div>
                 </mat-expansion-panel>
 
@@ -146,13 +118,23 @@
 
                   <div class="result">
                     <mat-form-field appearance="fill" class="result-form">
-                      <mat-label>Solve Time</mat-label>
+                      <mat-label>Solve Time (seconds)</mat-label>
                       <input matInput [formControl]="simulatorTime">
                     </mat-form-field>
                     <mat-form-field appearance="fill" class="result-form">
                       <mat-label>Best Result</mat-label>
-                      <input matInput [formControl]="simulatorTime">
+                      <input matInput [formControl]="simulatorResult">
                     </mat-form-field>
+                    <google-chart #chart *ngIf="simulatorMeasurements.length != 0"
+                      [type]="type"
+                      [data]="simulatorMeasurements"
+                      [options]="options"
+                      [width]="width"
+                      [height]="height">
+                    </google-chart>
+                    <button mat-raised-button color="accent" *ngIf="!isQuantumSimulatorRun" (click)="runQuantumSimulator()" [disabled]="n.invalid || target.invalid">
+                      <mat-icon inline=true>play_arrow</mat-icon>
+                    </button>
                   </div>
 
                 </mat-expansion-panel>
@@ -168,13 +150,23 @@
 
                   <div class="result">
                     <mat-form-field appearance="fill" class="result-form">
-                      <mat-label>Solve Time</mat-label>
+                      <mat-label>Solve Time (seconds)</mat-label>
                       <input matInput [formControl]="realTime">
                     </mat-form-field>
                     <mat-form-field appearance="fill" class="result-form">
                       <mat-label>Best Result</mat-label>
                       <input matInput [formControl]="realResult">
                     </mat-form-field>
+                    <google-chart #chart *ngIf="realMeasurements.length != 0"
+                      [type]="type"
+                      [data]="realMeasurements"
+                      [options]="options"
+                      [width]="width"
+                      [height]="height">
+                    </google-chart>
+                    <button mat-raised-button color="accent" *ngIf="!isQuantumRealRun" (click)="runQuantumReal()" [disabled]="n.invalid || target.invalid">
+                      <mat-icon inline=true>play_arrow</mat-icon>
+                    </button>
                   </div>
 
                 </mat-expansion-panel>
