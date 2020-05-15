@@ -1,0 +1,150 @@
+<mat-sidenav-container class="container">
+  <mat-sidenav-content>
+    <div class="app-navbar">
+      <nav class="navbar-header">
+        <button mat-icon-button color="accent">
+          <mat-icon>memory</mat-icon>
+        </button>
+        <h1 style="margin: 0 0 0 10px;">
+          Grover experiment
+        </h1>
+        <div class="flex-spacer"></div>
+      </nav>
+    </div>
+
+    <mat-drawer-container class="app">
+      <!-- <mat-drawer #drawer mode="side" opened>
+        <div class="drawer-content">
+          <div class="drawer-title">
+            <h2 style="margin: 8px 0 8px 0;">Configuration</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="drawer-config">
+            <h3>Number to find:</h3>
+            <mat-form-field appearance="outline" style="width: 100%;">
+              <input matInput [formControl]="number">
+              <mat-icon matSuffix>track_changes</mat-icon>
+            </mat-form-field>
+
+            <h3>Number Of Cards: {{ n }} </h3>
+            <mat-slider style="width: 100%;" [thumbLabel]="true" [min]="2" [max]="8" [(ngModel)]="n"></mat-slider>
+
+            <h3>Run with:</h3>
+            <div class="backend">
+              <mat-radio-group class="radio-group" [(ngModel)]="backend">
+                <mat-radio-button class="radio-button" value="player">
+                  Player
+                </mat-radio-button>
+                <mat-radio-button class="radio-button" value="classical">
+                  Classical (Loop)
+                </mat-radio-button>
+                <mat-radio-button class="radio-button" value="simulator">
+                  Quantum (Simulator)
+                </mat-radio-button>
+                <mat-radio-button class="radio-button" value="ibm">
+                  Quantum (IBM)
+                </mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <h3>Actions:</h3>
+            <div class="actions">
+              <button mat-stroked-button color="accent" style="margin-bottom: 6px;" (click)="generate()">
+                <mat-icon inline=true>library_add</mat-icon>
+                Generate
+              </button>
+              <button mat-stroked-button color="accent" (click)="shuffle()" [disabled]="cards?.length == 0 || game">
+                <mat-icon inline=true>shuffle</mat-icon>
+                Shuffle
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-drawer> -->
+      <mat-drawer-content class="app-content">
+        <section>
+          <mat-card>
+            <mat-card-content>
+              <h2 class="example-h2">Configuration</h2>
+              <div class="input-list">
+                <mat-form-field appearance="outline" class="input-form">
+                  <mat-label>N</mat-label>
+                  <input matInput type="number" [formControl]="n">
+                  <mat-icon matSuffix>straighten</mat-icon>
+                  <mat-error>N is required and must be between 2 and 4096</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="input-form">
+                  <mat-label>Target</mat-label>
+                  <input matInput type="number" [formControl]="target">
+                  <mat-icon matSuffix>track_changes</mat-icon>
+                  <mat-error>Target is required and must be a power of two like: 1, 2, 4, 8 ...</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="input-form">
+                  <mat-label>Target Hash</mat-label>
+                  <input matInput [formControl]="hash">
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="experiment">
+            <mat-card-content>
+              <div class="header">
+                <h2 class="example-h2">Experiment</h2>
+                <button mat-raised-button color="accent" (click)="run()" [disabled]="n.invalid || target.invalid">
+                  <mat-icon inline=true>play_arrow</mat-icon>
+                  Run
+                </button>
+              </div>
+              <div class="experiment-content">
+                <mat-list>
+
+                  <mat-list-item>
+                    <mat-icon mat-list-icon>developer_board</mat-icon>
+                    <div mat-line>Classical</div>
+                    <div>
+                      <mat-spinner *ngIf="isClassicalRun" color="accent" mode="indeterminate" diameter="20" n></mat-spinner>
+                    </div>
+                  </mat-list-item>
+
+                  <mat-divider [inset]="true"></mat-divider>
+
+                  <mat-list-item>
+                    <mat-icon mat-list-icon>developer_board</mat-icon>
+                    <div mat-line>Quantum Simulator Local</div>
+                    <div>
+                      <mat-spinner *ngIf="isQuantumLocalRun" color="accent" mode="indeterminate" diameter="20"></mat-spinner>
+                    </div>
+                  </mat-list-item>
+
+                  <mat-divider [inset]="true"></mat-divider>
+
+                  <mat-list-item>
+                    <mat-icon mat-list-icon>developer_board</mat-icon>
+                    <div mat-line>Quantum Simulator Remote</div>
+                    <div>
+                      <mat-spinner *ngIf="isQuantumSimulatorRun" color="accent" mode="indeterminate" diameter="20"></mat-spinner>
+                    </div>
+                  </mat-list-item>
+
+                  <mat-divider [inset]="true"></mat-divider>
+
+                  <mat-list-item>
+                    <mat-icon mat-list-icon>developer_board</mat-icon>
+                    <div mat-line>Quantum Real</div>
+                    <div>
+                      <mat-spinner *ngIf="isQuantumRealRun" color="accent" mode="indeterminate" diameter="20"></mat-spinner>
+                    </div>
+                  </mat-list-item>
+
+                </mat-list>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </mat-sidenav-content>
+</mat-sidenav-container>
